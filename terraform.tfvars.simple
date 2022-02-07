@@ -1,0 +1,6 @@
+#Fill up values and rename the file
+# mv terraform.tfvars.simple terraform.tfvars
+do_token = ""
+ssh_key_vlad = ""
+aws_access_key = ""
+aws_secret_key = ""
