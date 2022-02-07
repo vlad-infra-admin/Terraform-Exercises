@@ -7,6 +7,11 @@ terraform {
   }
 }
 
+# Configure the DigitalOcean Provider
+provider "digitalocean" {
+  token = var.do_token
+}
+
 data "digitalocean_ssh_key" "rebrain" {
   name = "REBRAIN.SSH.PUB.KEY"
 }
@@ -16,11 +21,7 @@ resource "digitalocean_ssh_key" "vlad" {
   public_key = var.ssh_key_vlad
 }
 
-# Configure the DigitalOcean Provider
-provider "digitalocean" {
-  token = var.do_token
-}
-
+# Configure VM
 resource "digitalocean_droplet" "web" {
   image  = "ubuntu-20-04-x64"
   name   = "web-1"
