@@ -1,5 +1,6 @@
 variable "do_token" {
-    type = string
+    type    = string
+    description = "Digital Ocean token"
 }
 
 variable "ssh_key_vlad" {
