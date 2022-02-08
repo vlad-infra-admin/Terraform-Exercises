@@ -8,7 +8,8 @@ terraform {
 }
 
 locals {
-  vm_ip       = digitalocean_droplet.web.ipv4_address
+  vm_count    = "3"
+  vm_ip       = digitalocean_droplet.web.*.ipv4_address
   common_tags = ["devops", "vlad24081990_at_gmail_com"]
 }
 
@@ -36,8 +37,9 @@ resource "digitalocean_ssh_key" "vlad" {
 
 # Configure VM
 resource "digitalocean_droplet" "web" {
+  count    = local.vm_count 
   image    = "ubuntu-20-04-x64"
-  name     = "web-1"
+  name     = "web-${count.index}"
   region   = "fra1"
   size     = "s-1vcpu-1gb"
   ssh_keys = [data.digitalocean_ssh_key.rebrain.id, digitalocean_ssh_key.vlad.fingerprint]
@@ -51,10 +53,11 @@ data "aws_route53_zone" "selected" {
 }
 
 resource "aws_route53_record" "devops_dns" {
+  count   = local.vm_count 
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "vlad24081990.${data.aws_route53_zone.selected.name}"
+  name    = "vlad24081990-${count.index}.${data.aws_route53_zone.selected.name}"
   type    = "A"
   ttl     = "300"
-  records = [local.vm_ip]
+  records = [element(local.vm_ip.*, count.index)]
 }
 
