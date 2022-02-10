@@ -35,16 +35,31 @@ resource "digitalocean_ssh_key" "vlad" {
   public_key = var.ssh_key_vlad
 }
 
-# Configure VM
+# Configure VMs
 resource "digitalocean_droplet" "web" {
-  count    = local.vm_count 
+  count    = local.vm_count
   image    = "ubuntu-20-04-x64"
   name     = "web-${count.index}"
   region   = "fra1"
   size     = "s-1vcpu-1gb"
   ssh_keys = [data.digitalocean_ssh_key.rebrain.id, digitalocean_ssh_key.vlad.fingerprint]
   tags     = local.common_tags
+
+  #Set user password for vms
+
+  connection {
+    type        = "ssh"
+    user        = "root"
+    host        = self.ipv4_address
+    private_key = file("~/.ssh/rebrain.key")
+  }
+  provisioner "remote-exec" {
+    inline = ["/bin/echo -e 'Password123\nPassword123'| /usr/bin/passwd root"]
+
+  }
 }
+
+
 
 # Configure DNS in route 53
 
@@ -53,11 +68,12 @@ data "aws_route53_zone" "selected" {
 }
 
 resource "aws_route53_record" "devops_dns" {
-  count   = local.vm_count 
+  count   = local.vm_count
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "vlad24081990-${count.index}.${data.aws_route53_zone.selected.name}"
   type    = "A"
   ttl     = "300"
   records = [element(local.vm_ip.*, count.index)]
 }
+
 
