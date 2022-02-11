@@ -8,10 +8,10 @@ variable "ssh_key_vlad" {
   description = "Personal SSH public key"
 }
 
-variable "ssh_private_key" {
-  type = "string"
-  description = "Personal SSH private key"
-  
+variable "ssh_private_key_path" {
+  type        = string
+  description = "Personal SSH private key path"
+
 }
 
 variable "aws_access_key" {

@@ -51,7 +51,7 @@ resource "digitalocean_droplet" "web" {
     type        = "ssh"
     user        = "root"
     host        = self.ipv4_address
-    private_key = var.ssh_private_key
+    private_key = file(var.ssh_private_key_path)
   }
   provisioner "remote-exec" {
     inline = [
