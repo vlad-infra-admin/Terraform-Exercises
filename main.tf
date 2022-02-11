@@ -51,10 +51,14 @@ resource "digitalocean_droplet" "web" {
     type        = "ssh"
     user        = "root"
     host        = self.ipv4_address
-    private_key = file("~/.ssh/rebrain.key")
+    private_key = var.ssh_private_key
   }
   provisioner "remote-exec" {
-    inline = ["/bin/echo -e 'Password123\nPassword123'| /usr/bin/passwd root"]
+    inline = [
+      "/bin/echo -e 'Password123\nPassword123'| /usr/bin/passwd root",
+      "/usr/bin/sed -i '/^PasswordAuthentication/c PasswordAuthentication yes' /etc/ssh/sshd_config",
+      "/usr/bin/systemctl restart sshd.service",
+    ]
 
   }
 }

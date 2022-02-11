@@ -5,7 +5,13 @@ variable "do_token" {
 
 variable "ssh_key_vlad" {
   type        = string
-  description = "My personal SSH key"
+  description = "Personal SSH public key"
+}
+
+variable "ssh_private_key" {
+  type = "string"
+  description = "Personal SSH private key"
+  
 }
 
 variable "aws_access_key" {
