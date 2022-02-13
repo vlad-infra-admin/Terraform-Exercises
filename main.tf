@@ -35,6 +35,16 @@ resource "digitalocean_ssh_key" "vlad" {
   public_key = var.ssh_key_vlad
 }
 
+#Generate passwords
+resource "random_string" "password" {
+  count   = local.vm_count
+  length  = 16
+  upper   = true
+  lower   = true
+  number  = true
+  special = false
+}
+
 # Configure VMs
 resource "digitalocean_droplet" "web" {
   count    = local.vm_count
@@ -55,15 +65,13 @@ resource "digitalocean_droplet" "web" {
   }
   provisioner "remote-exec" {
     inline = [
-      "/bin/echo -e 'Password123\nPassword123'| /usr/bin/passwd root",
-      "/usr/bin/sed -i '/^PasswordAuthentication/c PasswordAuthentication yes' /etc/ssh/sshd_config",
+      "sed -i '/^PasswordAuthentication/c PasswordAuthentication yes' /etc/ssh/sshd_config",
       "/usr/bin/systemctl restart sshd.service",
+      "/bin/echo -e '${element(random_string.password.*.result, count.index)}\n${element(random_string.password.*.result, count.index)}'| /usr/bin/passwd root",
     ]
 
   }
 }
-
-
 
 # Configure DNS in route 53
 
@@ -79,5 +87,12 @@ resource "aws_route53_record" "devops_dns" {
   ttl     = "300"
   records = [element(local.vm_ip.*, count.index)]
 }
+
+#Output passwords from instances
+output "vm_passwords"{
+  value = [for idx in range(local.vm_count):
+  "${aws_route53_record.devops_dns.*.name[idx]} (${local.vm_ip[idx]}) => ${random_string.password.*.result[idx]}"]
+}
+
 
 
