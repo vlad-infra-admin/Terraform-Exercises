@@ -77,11 +77,11 @@ resource "digitalocean_droplet" "web" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sleep 30",
-      "sed -i '/^PasswordAuthentication/c PasswordAuthentication yes' /etc/ssh/sshd_config",
-      "cat /etc/ssh/sshd_config | grep -i PasswordAuthentication",
-      "/usr/bin/systemctl restart sshd.service",
+      "sleep 40",
       "/bin/echo -e '${element(random_string.password.*.result, count.index)}\n${element(random_string.password.*.result, count.index)}'| /usr/bin/passwd root",
+      "sed -i '/^PasswordAuthentication/c PasswordAuthentication yes' /etc/ssh/sshd_config",
+      "cat /etc/ssh/sshd_config | grep -i ^PasswordAuthentication",
+      "/usr/bin/systemctl restart sshd.service",
     ]
 
   }
