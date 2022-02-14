@@ -3,7 +3,7 @@ variable "do_token" {
   description = "Digital Ocean token"
 }
 
-variable "ssh_key_vlad" {
+variable "ssh_key_personal" {
   type        = string
   description = "Personal SSH public key"
 }
@@ -22,5 +22,10 @@ variable "aws_access_key" {
 variable "aws_secret_key" {
   type        = string
   description = "AWS secret key"
+}
+
+variable "devs" {
+  type = list
+  default = ["lb-vlad24081990","app1-vlad24081990","app2-vlad24081990"]
 }
 
